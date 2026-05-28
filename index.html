@@ -31,6 +31,13 @@
     .player-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}.player-modal.active{display:flex}.player-card{width:min(430px,100%);max-height:92vh;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.35);overflow:auto}.player-photo{background:#111;border-bottom:1px solid var(--line)}.player-photo img{width:100%;height:auto;display:block;object-fit:contain}.player-photo.no-photo{height:220px;display:grid;place-items:center;font-size:52px;font-weight:900;color:var(--muted);background:rgba(127,127,127,.12)}.player-info{padding:12px;background:var(--card)}.player-info h3{margin:0 0 6px;font-size:24px;line-height:1.1}.player-badge{display:inline-block;background:var(--primary);color:#fff;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900;margin-bottom:10px}.player-data{display:grid;grid-template-columns:1fr 1fr;gap:7px}.player-data div{border:1px solid var(--line);border-radius:12px;padding:8px;background:rgba(127,127,127,.04);display:flex;align-items:center;gap:4px;min-height:34px}.player-data span{color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;white-space:nowrap}.player-data strong{font-size:15px}.close-player{width:100%;margin-top:10px}.match-modal{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:16px;z-index:55}.match-modal.active{display:flex}.match-card-modal{width:min(760px,100%);max-height:92vh;overflow:auto;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.35);padding:16px}.match-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.score-board{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center;margin:14px 0}.score-team{border:1px solid var(--line);border-radius:18px;padding:12px;background:rgba(127,127,127,.04)}.score-num{width:68px;height:58px;border-radius:16px;border:1px solid var(--line);display:grid;place-items:center;font-size:30px;font-weight:900;background:rgba(127,127,127,.08)}.match-actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.event-panel{border:1px solid var(--line);border-radius:18px;padding:12px;background:rgba(127,127,127,.025)}.event-list{display:grid;gap:8px;margin-top:10px}.event-item{border:1px solid var(--line);border-radius:14px;padding:9px 10px;background:rgba(127,127,127,.05);font-size:13px}.card-dot{display:inline-block;width:12px;height:16px;border-radius:3px;margin-right:5px;vertical-align:middle}.card-yellow{background:#facc15}.card-red{background:#dc2626}.disabled-option{color:#999}.finalized-note{padding:10px;border-radius:14px;background:rgba(127,127,127,.08);font-weight:800;text-align:center;margin-top:10px}.close-player{width:100%;margin-top:10px}
     @media(max-width:650px){.form-grid{grid-template-columns:1fr}table{font-size:12px}th,td{padding:9px 5px}.player-card{width:min(420px,100%)}.player-info h3{font-size:23px}}
   </style>
+
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#16a34a">
+<link rel="apple-touch-icon" href="LSL-logo192.png">
+
+
 </head>
 <body>
   <div class="app">
@@ -40,10 +47,6 @@
         <button class="theme-btn" id="themeToggle">🌙 Oscuro</button>
       </div>
       <div class="summary-grid"><div class="summary-card"><strong id="teamCount">0</strong><span>Equipos</span></div><div class="summary-card"><strong id="matchCount">0</strong><span>Partidos</span></div><div class="summary-card"><strong id="playerCount">0</strong><span>Jugadores</span></div></div>
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#16a34a">
-<link rel="apple-touch-icon" href="LSL-logo192.png">
 
     </header>
     <main>
