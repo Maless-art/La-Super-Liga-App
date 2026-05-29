@@ -146,6 +146,38 @@ h1{
     </div>
     <nav class="tabs"><button class="tab-btn active" data-tab="tabla">Tabla</button><button class="tab-btn" data-tab="partidos">Partidos</button><button class="tab-btn" data-tab="estadisticas">Stats</button><button class="tab-btn" data-tab="equipos">Equipos</button><button class="tab-btn admin-tab admin-only" data-tab="registro">Registro</button></nav>
   </div>
+
+<!-- conexion con firebase -->
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+  import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDTyUpvPLObbaFLNQTuzYk7_G9IrOqcsKM",
+    authDomain: "la-super-liga-59c32.firebaseapp.com",
+    projectId: "la-super-liga-59c32",
+    storageBucket: "la-super-liga-59c32.firebasestorage.app",
+    messagingSenderId: "22399484718",
+    appId: "1:22399484718:web:f797ae3fb19acf7b4db0bf"
+  };
+
+  const appFirebase = initializeApp(firebaseConfig);
+  const db = getFirestore(appFirebase);
+
+  window.db = db;
+  window.firebaseDoc = doc;
+  window.firebaseSetDoc = setDoc;
+  window.firebaseGetDoc = getDoc;
+</script>
+<!-- termina conexion con firebase -->
+
   <script>
     const KEY = 'la_super_liga_v1';
     const BACKUP_KEY = 'la_super_liga_backup_v1';
@@ -154,7 +186,14 @@ h1{
     const DB_VERSION = 1;
     const STORE_IMAGES = 'images';
 
-    let state = JSON.parse(localStorage.getItem(KEY)) || { theme:'light', teams:[], matches:[] };
+    let state = JSON.parse(localStorage.getItem(KEY)) || { theme:'light', teams:[], matches:[], currentRound:1 };
+    if(!state.teams) state.teams = [];
+    if(!state.matches) state.matches = [];
+    if(!state.currentRound) state.currentRound = 1;
+    state.matches.forEach(function(match){ if(!match.round) match.round = 1; });
+    if(state.matches.length){
+      state.currentRound = Math.max(state.currentRound, ...state.matches.map(function(match){ return Number(match.round || 1); }));
+    }
     let timerSeconds = 0;
     let timerInterval = null;
     let matchStatus = 'idle';
@@ -166,15 +205,70 @@ h1{
     const $ = function(selector){ return document.querySelector(selector); };
     const $$ = function(selector){ return document.querySelectorAll(selector); };
 
-    function saveState(){
-      try{
-        localStorage.setItem(KEY, JSON.stringify(state));
-      }catch(err){
-        alert('No se pudo guardar la información. El almacenamiento está lleno.');
-        return;
+async function saveToCloud(){
+  try{
+    await window.firebaseSetDoc(
+      window.firebaseDoc(window.db, "ligas", "principal"),
+      { estado: state }
+    );
+    console.log("Liga guardada en Firebase");
+  }catch(err){
+    console.error(err);
+  }
+}
+
+async function loadFromCloud(){
+  try{
+    const snap = await window.firebaseGetDoc(
+      window.firebaseDoc(window.db, "ligas", "principal")
+    );
+
+    if(snap.exists()){
+      const data = snap.data();
+
+      if(data.estado){
+        state = data.estado;
+        renderAll();
+        console.log("Liga cargada desde Firebase");
       }
-      renderAll();
     }
+  }catch(err){
+    console.error(err);
+  }
+}
+
+function listenToCloud(){
+
+  onSnapshot(
+    window.firebaseDoc(window.db, "ligas", "principal"),
+    (snap)=>{
+
+      if(!snap.exists()) return;
+
+      const data = snap.data();
+
+      if(data.estado){
+        state = data.estado;
+        renderAll();
+        console.log("Actualizado desde Firebase");
+      }
+
+    }
+  );
+
+}
+
+    function saveState(){
+  try{
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }catch(err){
+    alert('No se pudo guardar la información. El almacenamiento está lleno.');
+    return;
+  }
+
+  saveToCloud();
+  renderAll();
+}
 
     function openDB(){
       return new Promise(function(resolve, reject){
@@ -536,16 +630,23 @@ h1{
       return state.teams.every(function(team){ return team.players.length > 0; });
     }
 
-    function generateMatches(){
-      if(!canGenerateMatches()){
-        alert('Para generar partidos necesitas mínimo 2 equipos y al menos 1 jugador por equipo.');
-        return;
-      }
-      if(state.matches.length && !confirm('Ya existen partidos. ¿Deseas reemplazarlos?')) return;
+    function getCurrentRoundMatches(){
+      return state.matches.filter(function(match){ return Number(match.round || 1) === Number(state.currentRound || 1); });
+    }
 
-      const teams = state.teams;
+    function isCurrentRoundComplete(){
+      const current = getCurrentRoundMatches();
+      if(!current.length) return true;
+      return current.every(function(match){ return match.closed; });
+    }
+
+    function createRoundMatches(roundNumber){
+      const originalTeams = state.teams.slice();
+      const shift = originalTeams.length ? ((Number(roundNumber || 1) - 1) % originalTeams.length) : 0;
+      const teams = originalTeams.slice(shift).concat(originalTeams.slice(0, shift));
       const counts = {};
       teams.forEach(function(t){ counts[t.id] = 0; });
+
       const matches = [];
       let safety = 0;
 
@@ -554,17 +655,71 @@ h1{
         for(let i = 0; i < teams.length; i++){
           for(let j = i + 1; j < teams.length; j++){
             if(counts[teams[i].id] >= 6 || counts[teams[j].id] >= 6) continue;
+
             const shouldFlip = matches.length % 2 === 1;
             const home = shouldFlip ? teams[j] : teams[i];
             const away = shouldFlip ? teams[i] : teams[j];
-            matches.push({ id:crypto.randomUUID(), homeId:home.id, awayId:away.id, homeGoals:'', awayGoals:'', goals:[], cards:[], closed:false, expanded:true });
+
+            matches.push({
+              id:crypto.randomUUID(),
+              round:roundNumber,
+              homeId:home.id,
+              awayId:away.id,
+              homeGoals:'',
+              awayGoals:'',
+              goals:[],
+              cards:[],
+              events:[],
+              closed:false,
+              expanded:true,
+              status:'pending',
+              timerMode:'quick',
+              halfMinutes:25,
+              period:1,
+              elapsed:0,
+              addedMinutes:0,
+              addedActive:false
+            });
+
             counts[home.id]++;
             counts[away.id]++;
           }
         }
       }
 
-      state.matches = matches;
+      return matches;
+    }
+
+    function updateGenerateButtonLabel(){
+      const btn = $('#generateMatchesBtn');
+      if(!btn) return;
+      btn.textContent = state.matches.length ? 'Nueva fecha' : 'Generar partidos';
+    }
+
+    function generateMatches(){
+      if(!canGenerateMatches()){
+        alert('Para generar partidos necesitas mínimo 2 equipos y al menos 1 jugador por equipo.');
+        return;
+      }
+
+      if(!state.matches.length){
+        if(!confirm('¿Deseas generar la Fecha 1?')) return;
+        state.currentRound = 1;
+        state.matches = createRoundMatches(1);
+        saveState();
+        return;
+      }
+
+      if(!isCurrentRoundComplete()){
+        alert('No puedes generar una nueva fecha hasta finalizar todos los partidos de la fecha actual.');
+        return;
+      }
+
+      const nextRound = Number(state.currentRound || 1) + 1;
+      if(!confirm('¿Deseas generar la Fecha ' + nextRound + '? Los resultados y estadísticas acumuladas se conservarán.')) return;
+
+      state.currentRound = nextRound;
+      state.matches = state.matches.concat(createRoundMatches(nextRound));
       saveState();
     }
 
@@ -660,30 +815,43 @@ h1{
       if(!state.matches.length){
         box.className = 'empty';
         box.innerHTML = 'Todavía no hay partidos creados.';
+        updateGenerateButtonLabel();
         return;
       }
 
       box.className = '';
       let html = '';
-      state.matches.forEach(function(match, index){
-        const home = getTeamById(match.homeId);
-        const away = getTeamById(match.awayId);
-        if(!home || !away) return;
+      const rounds = Array.from(new Set(state.matches.map(function(match){ return Number(match.round || 1); }))).sort(function(a,b){ return a - b; });
 
-        ensureMatchTimerFields(match);
-        html += '<div class="team-card" style="margin-bottom:10px;cursor:pointer" onclick="openMatchDetail(\'' + match.id + '\')">';
-        html += '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">';
-        html += '<strong>Partido ' + (index + 1) + '</strong>';
-        html += renderStatusPill(match);
+      rounds.forEach(function(round){
+        const roundMatches = state.matches.filter(function(match){ return Number(match.round || 1) === round; });
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 0 10px">';
+        html += '<h3 style="margin:0">Fecha ' + round + '</h3>';
+        if(round === Number(state.currentRound || 1)) html += '<span class="hint">Fecha actual</span>';
         html += '</div>';
-        html += '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-top:12px;text-align:center">';
-        html += '<div style="text-align:left"><strong>' + escapeText(home.name) + '</strong></div>';
-        html += '<div><strong>' + (match.homeGoals || 0) + ' - ' + (match.awayGoals || 0) + '</strong><div class="hint" style="margin-top:5px">⏱ ' + formatMatchClock(match) + '</div></div>';
-        html += '<div style="text-align:right"><strong>' + escapeText(away.name) + '</strong></div>';
-        html += '</div>';
-        html += '</div>';
+
+        roundMatches.forEach(function(match, index){
+          const home = getTeamById(match.homeId);
+          const away = getTeamById(match.awayId);
+          if(!home || !away) return;
+
+          ensureMatchTimerFields(match);
+          html += '<div class="team-card" style="margin-bottom:10px;cursor:pointer" onclick="openMatchDetail(\'' + match.id + '\')">';
+          html += '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">';
+          html += '<strong>Partido ' + (index + 1) + '</strong>';
+          html += renderStatusPill(match);
+          html += '</div>';
+          html += '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-top:12px;text-align:center">';
+          html += '<div style="text-align:left"><strong>' + escapeText(home.name) + '</strong></div>';
+          html += '<div><strong>' + (match.homeGoals || 0) + ' - ' + (match.awayGoals || 0) + '</strong><div class="hint" style="margin-top:5px">⏱ ' + formatMatchClock(match) + '</div></div>';
+          html += '<div style="text-align:right"><strong>' + escapeText(away.name) + '</strong></div>';
+          html += '</div>';
+          html += '</div>';
+        });
       });
+
       box.innerHTML = html;
+      updateGenerateButtonLabel();
     }
 
     function openMatchDetail(matchId){
@@ -1116,7 +1284,7 @@ h1{
     $('#clearAllBtn').addEventListener('click', function(){
       if(!confirm('¿Seguro que deseas borrar todo el torneo?')) return;
       if(state.teams.length || state.matches.length) localStorage.setItem(BACKUP_KEY, JSON.stringify(state));
-      state = { theme:state.theme, teams:[], matches:[] };
+      state = { theme:state.theme, teams:[], matches:[], currentRound:1 };
       localStorage.setItem(KEY, JSON.stringify(state));
       renderAll();
     });
@@ -1321,6 +1489,8 @@ h1{
     }
 
     renderAll();
+loadFromCloud();
+listenToCloud();
   </script>
 </body>
 </html>
