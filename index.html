@@ -105,6 +105,7 @@ h1{
           <div class="section-title"><h2>Planificador</h2></div>
           <div class="btn-row admin-only" style="margin-bottom:12px">
             <button class="primary" id="generateMatchesBtn">Generar partidos</button>
+<button class="secondary" id="historicalMatchBtn">Partido histórico</button>
           </div>
           <div id="matchesBox" class="empty">Todavía no hay partidos creados.</div>
         </div>
@@ -117,6 +118,47 @@ h1{
         <div class="card" id="teamStatusCard" style="display:none"><div class="section-title"><h2>Estado de plantillas</h2></div><div id="teamStatusBox"></div></div>
         <div class="card" id="squadCard" style="display:none"><div class="section-title"><h2>Generar plantilla</h2></div><div class="form-grid"><div><label>Equipo</label><select id="squadTeamSelect"></select></div><div><label>Jugador a editar</label><select id="editPlayerSelect"><option value="">Seleccionar jugador</option></select></div><div><label>Nombre completo</label><input type="text" id="playerName" placeholder="Nombre del jugador"></div><div><label>Edad</label><input type="number" id="playerAge" placeholder="Ej. 28"></div><div><label>Apodo</label><input type="text" id="playerNickname" placeholder="Ej. El muro"></div><div><label>Número</label><input type="number" id="playerNumber" placeholder="Ej. 10"></div><div><label>Posición</label><select id="playerPosition"><option value="PT">PT</option><option value="DEF">DEF</option><option value="MED">MED</option><option value="DEL">DEL</option></select></div><div><label>Foto</label><input type="file" id="playerPhoto" accept="image/*"></div><div class="full btn-row"><button class="primary" id="savePlayerBtn">Registrar jugador</button><button class="secondary" id="editModeBtn">Cargar para editar</button><button class="secondary" id="cancelEditBtn" style="display:none">Cancelar edición</button></div></div></div>
       </section>
+
+
+<div class="card admin-only" id="historicalMatchCard" style="display:none">
+  <div class="section-title">
+    <h2>Partido histórico</h2>
+    <button class="secondary" id="closeHistoricalBtn">Cerrar</button>
+  </div>
+
+  <div class="form-grid">
+    <div>
+      <label>Fecha</label>
+      <input type="number" id="historicalRound" placeholder="Ej. 1">
+    </div>
+
+    <div>
+      <label>Equipo A</label>
+      <select id="historicalHome"></select>
+    </div>
+
+    <div>
+      <label>Equipo B</label>
+      <select id="historicalAway"></select>
+    </div>
+
+    <div>
+      <label>Goles Equipo A</label>
+      <input type="number" id="historicalHomeGoals" min="0" value="0">
+    </div>
+
+    <div>
+      <label>Goles Equipo B</label>
+      <input type="number" id="historicalAwayGoals" min="0" value="0">
+    </div>
+
+    <div class="full">
+      <button class="primary" id="saveHistoricalMatchBtn">Guardar partido histórico</button>
+    </div>
+  </div>
+</div>
+
+
     </main>
     <div class="player-modal" id="playerModal">
       <div class="player-card" id="playerDetailCard"></div>
@@ -727,6 +769,82 @@ function listenToCloud(){
       saveState();
     }
 
+
+function renderHistoricalTeams(){
+  const home = $('#historicalHome');
+  const away = $('#historicalAway');
+  if(!home || !away) return;
+
+  const options = state.teams.map(function(team){
+    return '<option value="' + team.id + '">' + escapeText(team.name) + '</option>';
+  }).join('');
+
+  home.innerHTML = options;
+  away.innerHTML = options;
+
+  $('#historicalRound').value = state.currentRound || 1;
+}
+
+$('#historicalMatchBtn').addEventListener('click', function(){
+  renderHistoricalTeams();
+  $('#historicalMatchCard').style.display = 'block';
+});
+
+$('#closeHistoricalBtn').addEventListener('click', function(){
+  $('#historicalMatchCard').style.display = 'none';
+});
+
+$('#saveHistoricalMatchBtn').addEventListener('click', function(){
+  const round = Number($('#historicalRound').value || 1);
+  const homeId = $('#historicalHome').value;
+  const awayId = $('#historicalAway').value;
+  const homeGoals = Number($('#historicalHomeGoals').value || 0);
+  const awayGoals = Number($('#historicalAwayGoals').value || 0);
+
+  if(!homeId || !awayId){
+    alert('Selecciona ambos equipos.');
+    return;
+  }
+
+  if(homeId === awayId){
+    alert('No puedes seleccionar el mismo equipo.');
+    return;
+  }
+
+  if(!confirm('¿Guardar este partido histórico? Se sumará a la tabla y estadísticas.')) return;
+
+  state.matches.push({
+    id: crypto.randomUUID(),
+    round: round,
+    historical: true,
+    homeId: homeId,
+    awayId: awayId,
+    homeGoals: homeGoals,
+    awayGoals: awayGoals,
+    goals: [],
+    cards: [],
+    events: [],
+    closed: true,
+    expanded: true,
+    status: 'finished',
+    timerMode: 'quick',
+    halfMinutes: 25,
+    period: 1,
+    elapsed: 0,
+    addedMinutes: 0,
+    addedActive: false
+  });
+
+  if(round > Number(state.currentRound || 1)){
+    state.currentRound = round;
+  }
+
+  $('#historicalHomeGoals').value = 0;
+  $('#historicalAwayGoals').value = 0;
+  $('#historicalMatchCard').style.display = 'none';
+
+  saveState();
+});
     function getTeamById(teamId){
       return state.teams.find(function(t){ return t.id === teamId; });
     }
@@ -956,9 +1074,15 @@ function listenToCloud(){
         html += '<button class="danger" onclick="finishSelectedMatch()">Finalizar</button>';
         html += '</div>';
         html += '</div>';
-      }else{
-        html += '<div class="finalized-note">Partido finalizado · consulta de datos</div>';
-      }
+     }else{
+  html += '<div class="finalized-note">Partido finalizado · consulta de datos</div>';
+
+  if(match.historical && isAdmin){
+    html += '<div class="btn-row" style="margin-top:10px">';
+    html += '<button class="secondary" onclick="toggleHistoricalEdit()">Editar eventos históricos</button>';
+    html += '</div>';
+  }
+}
 
       html += '<div class="score-board">';
       html += '<div class="score-team"><strong>' + escapeText(home.name) + '</strong></div>';
@@ -966,10 +1090,12 @@ function listenToCloud(){
       html += '<div class="score-team"><strong>' + escapeText(away.name) + '</strong></div>';
       html += '</div>';
 
-      html += '<div class="match-actions-grid">';
-      html += renderEventPanel(match, home, 'home');
-      html += renderEventPanel(match, away, 'away');
-      html += '</div>';
+      if(!match.closed || (match.historical && match.editHistorical && isAdmin)){
+  html += '<div class="match-actions-grid">';
+  html += renderEventPanel(match, home, 'home');
+  html += renderEventPanel(match, away, 'away');
+  html += '</div>';
+}
 
       html += '<h3>Historial cronológico</h3>';
       html += '<div class="event-list">' + renderEvents(match) + '</div>';
@@ -985,9 +1111,9 @@ function listenToCloud(){
       if(!isClosed){
         html += '<label>Gol</label>';
         html += '<select id="goal_' + side + '">' + renderPlayerOptions(team.id, match, true) + '</select>';
-        html += '<button class="primary" style="margin-top:8px;width:100%" onclick="addGoalEvent(\'' + match.id + '\',\'' + team.id + '\',\'' + side + '\')">Registrar gol</button>';
+        html += '<button class="primary" style="margin-top:8px;width:100%" onclick="addSmartGoalEvent(\'' + match.id + '\',\'' + team.id + '\',\'' + side + '\')">Registrar gol</button>';
         html += '<div class="btn-row" style="margin-top:12px">';
-        html += '<button class="secondary" onclick="addCardEvent(\'' + match.id + '\',\'' + team.id + '\',\'' + side + '\',\'yellow\')">🟨 Amarilla</button>';
+        html += '<button class="secondary" onclick="addSmartCardEvent(\'' + match.id + '\',\'' + team.id + '\',\'' + side + '\',\'yellow\')">🟨 Amarilla</button>';
         html += '<button class="danger" onclick="addCardEvent(\'' + match.id + '\',\'' + team.id + '\',\'' + side + '\',\'red\')">🟥 Roja</button>';
         html += '</div>';
         html += '<select id="card_' + side + '" style="margin-top:8px">' + renderPlayerOptions(team.id, match, false) + '</select>';
@@ -1043,6 +1169,61 @@ function listenToCloud(){
       saveState();
       renderMatchDetail();
     }
+
+function addSmartGoalEvent(matchId, teamId, side){
+  const match = getMatchById(matchId);
+  if(!match) return;
+
+  if(match.historical && match.editHistorical){
+    const playerId = $('#goal_' + side).value;
+    if(!playerId){ alert('Selecciona el goleador.'); return; }
+
+    const minute = prompt('Minuto del gol:', '0');
+    if(minute === null) return;
+
+    if(!match.events) match.events = [];
+    match.events.push({
+      type:'goal',
+      teamId:teamId,
+      playerId:playerId,
+      seconds:Number(minute || 0) * 60
+    });
+
+    saveState();
+    renderMatchDetail();
+    return;
+  }
+
+  addGoalEvent(matchId, teamId, side);
+}
+
+function addSmartCardEvent(matchId, teamId, side, cardType){
+  const match = getMatchById(matchId);
+  if(!match) return;
+
+  if(match.historical && match.editHistorical){
+    const playerId = $('#card_' + side).value;
+    if(!playerId){ alert('Selecciona el jugador.'); return; }
+
+    const minute = prompt('Minuto de la tarjeta:', '0');
+    if(minute === null) return;
+
+    if(!match.events) match.events = [];
+    match.events.push({
+      type:cardType,
+      teamId:teamId,
+      playerId:playerId,
+      seconds:Number(minute || 0) * 60
+    });
+
+    saveState();
+    renderMatchDetail();
+    return;
+  }
+
+  addCardEvent(matchId, teamId, side, cardType);
+}
+
 
     function getPlayerInfo(playerId){
       for(const team of state.teams){
