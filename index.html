@@ -1113,11 +1113,11 @@ function toggleHistoricalEdit(){
   renderMatchDetail();
 }
     function renderEventPanel(match, team, side){
-      const isClosed = match.closed;
+      const isClosed = match.closed && !match.historical;
       let html = '<div class="event-panel">';
       html += '<h3 style="margin-top:0">' + escapeText(team.name) + '</h3>';
 
-      if(!isClosed || (match.historical && isAdmin)){
+      if(!isClosed){
         html += '<label>Gol</label>';
         html += '<select id="goal_' + side + '">' + renderPlayerOptions(team.id, match, true) + '</select>';
         html += '<button class="primary" style="margin-top:8px;width:100%" onclick="addSmartGoalEvent(\'' + match.id + '\',\'' + team.id + '\',\'' + side + '\')">Registrar gol</button>';
