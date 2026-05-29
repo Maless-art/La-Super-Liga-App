@@ -1117,13 +1117,13 @@ function toggleHistoricalEdit(){
       let html = '<div class="event-panel">';
       html += '<h3 style="margin-top:0">' + escapeText(team.name) + '</h3>';
 
-      if(!isClosed){
+      if(!isClosed || (match.historical && match.editHistorical && isAdmin)){
         html += '<label>Gol</label>';
         html += '<select id="goal_' + side + '">' + renderPlayerOptions(team.id, match, true) + '</select>';
         html += '<button class="primary" style="margin-top:8px;width:100%" onclick="addSmartGoalEvent(\'' + match.id + '\',\'' + team.id + '\',\'' + side + '\')">Registrar gol</button>';
         html += '<div class="btn-row" style="margin-top:12px">';
         html += '<button class="secondary" onclick="addSmartCardEvent(\'' + match.id + '\',\'' + team.id + '\',\'' + side + '\',\'yellow\')">🟨 Amarilla</button>';
-        html += '<button class="danger" onclick="addCardEvent(\'' + match.id + '\',\'' + team.id + '\',\'' + side + '\',\'red\')">🟥 Roja</button>';
+        html += '<button class="danger" onclick="addSmartCardEvent(\'' + match.id + '\',\'' + team.id + '\',\'' + side + '\',\'red\')">🟥 Roja</button>';
         html += '</div>';
         html += '<select id="card_' + side + '" style="margin-top:8px">' + renderPlayerOptions(team.id, match, false) + '</select>';
       }
