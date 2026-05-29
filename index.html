@@ -1078,11 +1078,7 @@ $('#saveHistoricalMatchBtn').addEventListener('click', function(){
      }else{
   html += '<div class="finalized-note">Partido finalizado · consulta de datos</div>';
 
-  if(match.historical && isAdmin){
-    html += '<div class="btn-row" style="margin-top:10px">';
-    html += '<button class="secondary" onclick="toggleHistoricalEdit()">Editar eventos históricos</button>';
-    html += '</div>';
-  }
+  
 }
 
       html += '<div class="score-board">';
@@ -1105,19 +1101,12 @@ if(!match.closed || (match.historical && isAdmin)){
     }
 
 
-function toggleHistoricalEdit(){
-  const match = getMatchById(activeMatchId);
-  if(!match || !match.historical || !isAdmin) return;
-
-  match.editHistorical = true;
-  renderMatchDetail();
-}
     function renderEventPanel(match, team, side){
       const isClosed = match.closed && !match.historical;
       let html = '<div class="event-panel">';
       html += '<h3 style="margin-top:0">' + escapeText(team.name) + '</h3>';
 
-      if(!isClosed){
+if(!isClosed || (match.historical && isAdmin)){
         html += '<label>Gol</label>';
         html += '<select id="goal_' + side + '">' + renderPlayerOptions(team.id, match, true) + '</select>';
         html += '<button class="primary" style="margin-top:8px;width:100%" onclick="addSmartGoalEvent(\'' + match.id + '\',\'' + team.id + '\',\'' + side + '\')">Registrar gol</button>';
