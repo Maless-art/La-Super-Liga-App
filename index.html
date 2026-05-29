@@ -1091,7 +1091,7 @@ $('#saveHistoricalMatchBtn').addEventListener('click', function(){
       html += '<div class="score-team"><strong>' + escapeText(away.name) + '</strong></div>';
       html += '</div>';
 
-      if(!match.closed || (match.historical && match.editHistorical && isAdmin)){
+if(!match.closed || (match.historical && isAdmin)){
   html += '<div class="match-actions-grid">';
   html += renderEventPanel(match, home, 'home');
   html += renderEventPanel(match, away, 'away');
@@ -1117,7 +1117,7 @@ function toggleHistoricalEdit(){
       let html = '<div class="event-panel">';
       html += '<h3 style="margin-top:0">' + escapeText(team.name) + '</h3>';
 
-      if(!isClosed || (match.historical && match.editHistorical && isAdmin)){
+      if(!isClosed || (match.historical && isAdmin)){
         html += '<label>Gol</label>';
         html += '<select id="goal_' + side + '">' + renderPlayerOptions(team.id, match, true) + '</select>';
         html += '<button class="primary" style="margin-top:8px;width:100%" onclick="addSmartGoalEvent(\'' + match.id + '\',\'' + team.id + '\',\'' + side + '\')">Registrar gol</button>';
@@ -1183,7 +1183,7 @@ function addSmartGoalEvent(matchId, teamId, side){
   const match = getMatchById(matchId);
   if(!match) return;
 
-  if(match.historical && match.editHistorical){
+if(match.historical){
     const playerId = $('#goal_' + side).value;
     if(!playerId){ alert('Selecciona el goleador.'); return; }
 
@@ -1210,7 +1210,7 @@ function addSmartCardEvent(matchId, teamId, side, cardType){
   const match = getMatchById(matchId);
   if(!match) return;
 
-  if(match.historical && match.editHistorical){
+if(match.historical){
     const playerId = $('#card_' + side).value;
     if(!playerId){ alert('Selecciona el jugador.'); return; }
 
