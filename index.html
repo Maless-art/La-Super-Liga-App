@@ -108,18 +108,6 @@ h1{
 <button class="secondary" id="historicalMatchBtn">Partido histórico</button>
           </div>
           <div id="matchesBox" class="empty">Todavía no hay partidos creados.</div>
-        </div>
-      </section>
-      <section class="screen" id="screen-estadisticas"><div class="card"><div class="section-title"><h2>Estadísticas</h2></div><select id="statsSelector"><option value="goles">Tabla de goles</option><option value="heroes">Los héroes</option><option value="tarjetas">Tarjetas</option></select><div id="statsBox" style="margin-top:14px"></div></div></section>
-      <section class="screen" id="screen-equipos"><div class="card"><div class="section-title"><h2>Equipos</h2></div><div id="teamsBox"></div></div></section>
-      <section class="screen" id="screen-registro">
-        <div class="card" id="loginCard"><div class="section-title"><h2>Registro protegido</h2></div><div class="locked"><p class="hint">Ingresa la contraseña para registrar equipos y plantillas.</p><input type="password" id="adminPassword" placeholder="Contraseña"><button class="primary" id="unlockBtn">Entrar</button><p class="hint">Contraseña inicial: <strong>admin123</strong></p></div></div>
-        <div class="card" id="registerCard" style="display:none"><div class="section-title"><h2>Registrar equipo</h2><button class="secondary" id="lockBtn">Bloquear</button></div><div class="form-grid"><div><label>Nombre del equipo</label><input type="text" id="teamName" placeholder="Ej. Los Titanes"></div><div><label>Logo del equipo</label><input type="file" id="teamLogo" accept="image/*"></div><div class="full btn-row"><button class="primary" id="saveTeamBtn">Registrar equipo</button><button class="secondary" id="exportBackupBtn">Backup</button><label class="secondary" style="display:inline-flex;align-items:center;cursor:pointer"><input type="file" id="importBackupInput" accept="application/json" style="display:none">Importar backup</label><button class="secondary" id="restoreBackupBtn">Restaurar último backup</button><button class="danger" id="clearAllBtn">Limpiar torneo</button></div></div></div>
-        <div class="card" id="teamStatusCard" style="display:none"><div class="section-title"><h2>Estado de plantillas</h2></div><div id="teamStatusBox"></div></div>
-        <div class="card" id="squadCard" style="display:none"><div class="section-title"><h2>Generar plantilla</h2></div><div class="form-grid"><div><label>Equipo</label><select id="squadTeamSelect"></select></div><div><label>Jugador a editar</label><select id="editPlayerSelect"><option value="">Seleccionar jugador</option></select></div><div><label>Nombre completo</label><input type="text" id="playerName" placeholder="Nombre del jugador"></div><div><label>Edad</label><input type="number" id="playerAge" placeholder="Ej. 28"></div><div><label>Apodo</label><input type="text" id="playerNickname" placeholder="Ej. El muro"></div><div><label>Número</label><input type="number" id="playerNumber" placeholder="Ej. 10"></div><div><label>Posición</label><select id="playerPosition"><option value="PT">PT</option><option value="DEF">DEF</option><option value="MED">MED</option><option value="DEL">DEL</option></select></div><div><label>Foto</label><input type="file" id="playerPhoto" accept="image/*"></div><div class="full btn-row"><button class="primary" id="savePlayerBtn">Registrar jugador</button><button class="secondary" id="editModeBtn">Cargar para editar</button><button class="secondary" id="cancelEditBtn" style="display:none">Cancelar edición</button></div></div></div>
-      </section>
-
-
 <div class="card admin-only" id="historicalMatchCard" style="display:none">
   <div class="section-title">
     <h2>Partido histórico</h2>
@@ -157,6 +145,19 @@ h1{
     </div>
   </div>
 </div>
+
+        </div>
+      </section>
+      <section class="screen" id="screen-estadisticas"><div class="card"><div class="section-title"><h2>Estadísticas</h2></div><select id="statsSelector"><option value="goles">Tabla de goles</option><option value="heroes">Los héroes</option><option value="tarjetas">Tarjetas</option></select><div id="statsBox" style="margin-top:14px"></div></div></section>
+      <section class="screen" id="screen-equipos"><div class="card"><div class="section-title"><h2>Equipos</h2></div><div id="teamsBox"></div></div></section>
+      <section class="screen" id="screen-registro">
+        <div class="card" id="loginCard"><div class="section-title"><h2>Registro protegido</h2></div><div class="locked"><p class="hint">Ingresa la contraseña para registrar equipos y plantillas.</p><input type="password" id="adminPassword" placeholder="Contraseña"><button class="primary" id="unlockBtn">Entrar</button><p class="hint">Contraseña inicial: <strong>admin123</strong></p></div></div>
+        <div class="card" id="registerCard" style="display:none"><div class="section-title"><h2>Registrar equipo</h2><button class="secondary" id="lockBtn">Bloquear</button></div><div class="form-grid"><div><label>Nombre del equipo</label><input type="text" id="teamName" placeholder="Ej. Los Titanes"></div><div><label>Logo del equipo</label><input type="file" id="teamLogo" accept="image/*"></div><div class="full btn-row"><button class="primary" id="saveTeamBtn">Registrar equipo</button><button class="secondary" id="exportBackupBtn">Backup</button><label class="secondary" style="display:inline-flex;align-items:center;cursor:pointer"><input type="file" id="importBackupInput" accept="application/json" style="display:none">Importar backup</label><button class="secondary" id="restoreBackupBtn">Restaurar último backup</button><button class="danger" id="clearAllBtn">Limpiar torneo</button></div></div></div>
+        <div class="card" id="teamStatusCard" style="display:none"><div class="section-title"><h2>Estado de plantillas</h2></div><div id="teamStatusBox"></div></div>
+        <div class="card" id="squadCard" style="display:none"><div class="section-title"><h2>Generar plantilla</h2></div><div class="form-grid"><div><label>Equipo</label><select id="squadTeamSelect"></select></div><div><label>Jugador a editar</label><select id="editPlayerSelect"><option value="">Seleccionar jugador</option></select></div><div><label>Nombre completo</label><input type="text" id="playerName" placeholder="Nombre del jugador"></div><div><label>Edad</label><input type="number" id="playerAge" placeholder="Ej. 28"></div><div><label>Apodo</label><input type="text" id="playerNickname" placeholder="Ej. El muro"></div><div><label>Número</label><input type="number" id="playerNumber" placeholder="Ej. 10"></div><div><label>Posición</label><select id="playerPosition"><option value="PT">PT</option><option value="DEF">DEF</option><option value="MED">MED</option><option value="DEL">DEL</option></select></div><div><label>Foto</label><input type="file" id="playerPhoto" accept="image/*"></div><div class="full btn-row"><button class="primary" id="savePlayerBtn">Registrar jugador</button><button class="secondary" id="editModeBtn">Cargar para editar</button><button class="secondary" id="cancelEditBtn" style="display:none">Cancelar edición</button></div></div></div>
+      </section>
+
+
 
 
     </main>
@@ -1103,6 +1104,14 @@ $('#saveHistoricalMatchBtn').addEventListener('click', function(){
       $('#matchDetailCard').innerHTML = html;
     }
 
+
+function toggleHistoricalEdit(){
+  const match = getMatchById(activeMatchId);
+  if(!match || !match.historical || !isAdmin) return;
+
+  match.editHistorical = true;
+  renderMatchDetail();
+}
     function renderEventPanel(match, team, side){
       const isClosed = match.closed;
       let html = '<div class="event-panel">';
