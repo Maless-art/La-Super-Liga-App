@@ -147,18 +147,10 @@ h1{
     <nav class="tabs"><button class="tab-btn active" data-tab="tabla">Tabla</button><button class="tab-btn" data-tab="partidos">Partidos</button><button class="tab-btn" data-tab="estadisticas">Stats</button><button class="tab-btn" data-tab="equipos">Equipos</button><button class="tab-btn admin-tab admin-only" data-tab="registro">Registro</button></nav>
   </div>
 
-<!-- conexion con firebase -->
+<script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore-compat.js"></script>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-  import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
-
+<script>
   const firebaseConfig = {
     apiKey: "AIzaSyDTyUpvPLObbaFLNQTuzYk7_G9IrOqcsKM",
     authDomain: "la-super-liga-59c32.firebaseapp.com",
@@ -168,15 +160,9 @@ h1{
     appId: "1:22399484718:web:f797ae3fb19acf7b4db0bf"
   };
 
-  const appFirebase = initializeApp(firebaseConfig);
-  const db = getFirestore(appFirebase);
-
-  window.db = db;
-  window.firebaseDoc = doc;
-  window.firebaseSetDoc = setDoc;
-  window.firebaseGetDoc = getDoc;
+  firebase.initializeApp(firebaseConfig);
+  window.db = firebase.firestore();
 </script>
-<!-- termina conexion con firebase -->
 
   <script>
     const KEY = 'la_super_liga_v1';
@@ -207,10 +193,10 @@ h1{
 
 async function saveToCloud(){
   try{
-    await window.firebaseSetDoc(
-      window.firebaseDoc(window.db, "ligas", "principal"),
-      { estado: state }
-    );
+    await window.db.collection("ligas").doc("principal").set({
+      estado: state,
+      updatedAt: new Date().toISOString()
+    }, { merge:true });
     console.log("Liga guardada en Firebase");
   }catch(err){
     console.error(err);
@@ -219,45 +205,41 @@ async function saveToCloud(){
 
 async function loadFromCloud(){
   try{
-    const snap = await window.firebaseGetDoc(
-      window.firebaseDoc(window.db, "ligas", "principal")
-    );
+    const snap = await window.db.collection("ligas").doc("principal").get();
 
-    if(snap.exists()){
-      const data = snap.data();
+    if(!snap.exists) return;
 
-      if(data.estado){
-        state = data.estado;
-        renderAll();
-        console.log("Liga cargada desde Firebase");
-      }
-    }
+    const data = snap.data();
+
+    if(!data.estado) return;
+    if(!data.estado.teams || !data.estado.matches) return;
+    if(data.estado.teams.length === 0 && state.teams.length > 0) return;
+
+    state = data.estado;
+    localStorage.setItem(KEY, JSON.stringify(state));
+    renderAll();
+    console.log("Liga cargada desde Firebase");
   }catch(err){
     console.error(err);
   }
 }
 
 function listenToCloud(){
+  window.db.collection("ligas").doc("principal").onSnapshot(function(snap){
+    if(!snap.exists) return;
 
-  onSnapshot(
-    window.firebaseDoc(window.db, "ligas", "principal"),
-    (snap)=>{
+    const data = snap.data();
 
-      if(!snap.exists()) return;
+    if(!data.estado) return;
+    if(!data.estado.teams || !data.estado.matches) return;
+    if(data.estado.teams.length === 0 && state.teams.length > 0) return;
 
-      const data = snap.data();
-
-      if(data.estado){
-        state = data.estado;
-        renderAll();
-        console.log("Actualizado desde Firebase");
-      }
-
-    }
-  );
-
+    state = data.estado;
+    localStorage.setItem(KEY, JSON.stringify(state));
+    renderAll();
+    console.log("Actualizado desde Firebase");
+  });
 }
-
     function saveState(){
   try{
     localStorage.setItem(KEY, JSON.stringify(state));
