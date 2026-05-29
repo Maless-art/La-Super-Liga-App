@@ -1302,7 +1302,8 @@ function listenToCloud(){
       if(state.teams.length || state.matches.length) localStorage.setItem(BACKUP_KEY, JSON.stringify(state));
       state = { theme:state.theme, teams:[], matches:[], currentRound:1 };
       localStorage.setItem(KEY, JSON.stringify(state));
-      renderAll();
+saveToCloud();
+renderAll();
     });
 
     function formatTimer(seconds){
