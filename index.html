@@ -10,11 +10,7 @@
       --primary:#0f7a43;--primary2:#22c55e;--accent:#172554;--tab:#fff;
       --shadow:0 10px 25px rgba(15,23,42,.08);
     }
-    body.dark{
-      --bg:#070707;--card:#151515;--text:#f9fafb;--muted:#a1a1aa;--line:#2b2b2b;
-      --primary:#d71920;--primary2:#111111;--accent:#fff;--tab:#111;
-      --shadow:0 10px 28px rgba(0,0,0,.45);
-    }
+    
     *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
     .app{max-width:1100px;margin:0 auto;min-height:100vh;padding-bottom:88px}
     header{
@@ -97,8 +93,7 @@ h1{
     </div>
   </div>
 
-  <button class="theme-btn" id="themeToggle">🌙 Oscuro</button>
-
+ 
 </div>
       <div class="summary-grid"><div class="summary-card"><strong id="teamCount">0</strong><span>Equipos</span></div><div class="summary-card"><strong id="matchCount">0</strong><span>Partidos</span></div><div class="summary-card"><strong id="playerCount">0</strong><span>Jugadores</span></div></div>
 
@@ -172,7 +167,7 @@ h1{
     const DB_VERSION = 1;
     const STORE_IMAGES = 'images';
 
-    let state = JSON.parse(localStorage.getItem(KEY)) || { theme:'light', teams:[], matches:[], currentRound:1 };
+    let state = JSON.parse(localStorage.getItem(KEY)) || { teams:[], matches:[], currentRound:1 };
     if(!state.teams) state.teams = [];
     if(!state.matches) state.matches = [];
     if(!state.currentRound) state.currentRound = 1;
@@ -334,15 +329,8 @@ function listenToCloud(){
       });
     }
 
-    function applyTheme(){
-      document.body.classList.toggle('dark', state.theme === 'dark');
-      $('#themeToggle').textContent = state.theme === 'dark' ? '☀️ Claro' : '🌙 Oscuro';
-    }
 
-    $('#themeToggle').addEventListener('click', function(){
-      state.theme = state.theme === 'dark' ? 'light' : 'dark';
-      saveState();
-    });
+   
 
     function updateAdminView(){
       document.body.classList.toggle('is-admin', isAdmin);
@@ -1300,7 +1288,7 @@ function listenToCloud(){
     $('#clearAllBtn').addEventListener('click', function(){
       if(!confirm('¿Seguro que deseas borrar todo el torneo?')) return;
       if(state.teams.length || state.matches.length) localStorage.setItem(BACKUP_KEY, JSON.stringify(state));
-      state = { theme:state.theme, teams:[], matches:[], currentRound:1 };
+     state = { teams:[], matches:[], currentRound:1 };
       localStorage.setItem(KEY, JSON.stringify(state));
 saveToCloud();
 renderAll();
@@ -1493,7 +1481,7 @@ renderAll();
     }
 
     function renderAll(){
-      applyTheme();
+    
       renderSummary();
       renderStandings();
       renderTeams();
