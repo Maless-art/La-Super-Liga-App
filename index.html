@@ -141,7 +141,7 @@ h1{
     </div>
 
     <div class="full">
-      <button class="primary" id="saveHistoricalMatchBtn">Guardar partido histórico</button>
+      <!-- <button class="primary" id="saveHistoricalMatchBtn">Guardar partido histórico</button> -->
     </div>
   </div>
 </div>
@@ -214,6 +214,7 @@ h1{
     if(!state.teams) state.teams = [];
     if(!state.matches) state.matches = [];
     if(!state.currentRound) state.currentRound = 1;
+if(!state.rounds) state.rounds = [1,2];
     state.matches.forEach(function(match){ if(!match.round) match.round = 1; });
     if(state.matches.length){
       state.currentRound = Math.max(state.currentRound, ...state.matches.map(function(match){ return Number(match.round || 1); }));
@@ -745,14 +746,18 @@ function listenToCloud(){
     }
 
     function generateMatches(){
-  const nextRound = state.matches.length
-    ? Math.max(...state.matches.map(m => Number(m.round || 1))) + 1
+  if(!state.rounds) state.rounds = [];
+
+  const nextRound = state.rounds.length
+    ? Math.max(...state.rounds) + 1
     : 1;
 
   if(!confirm('¿Deseas crear la Fecha ' + nextRound + '?')) return;
 
+  state.rounds.push(nextRound);
   state.currentRound = nextRound;
   activeRoundView = nextRound;
+
   saveState();
 }
 
@@ -931,10 +936,12 @@ $('#saveHistoricalMatchBtn').addEventListener('click', function(){
 
   box.className = '';
 
-  const rounds = Array.from(new Set(state.matches.map(function(match){
-    return Number(match.round || 1);
-  }))).sort(function(a,b){ return a - b; });
+  const matchRounds = state.matches.map(function(match){
+  return Number(match.round || 1);
+});
 
+const rounds = Array.from(new Set([...(state.rounds || []), ...matchRounds]))
+  .sort(function(a,b){ return a - b; });
   if(!rounds.includes(activeRoundView)){
     activeRoundView = rounds[rounds.length - 1];
   }
