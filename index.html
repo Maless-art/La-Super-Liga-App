@@ -998,7 +998,7 @@ const rounds = Array.from(new Set([...(state.rounds || []), ...matchRounds]))
       html += '<div class="score-team"><strong>' + escapeText(away.name) + '</strong></div>';
       html += '</div>';
 
-if(isAdmin && (match.historical || match.closed)){
+if(isAdmin){
   html += '<div class="match-actions-grid">';
   html += renderEventPanel(match, home, 'home');
   html += renderEventPanel(match, away, 'away');
