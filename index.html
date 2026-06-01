@@ -223,6 +223,7 @@ h1{
     let matchStatus = 'idle';
     let editingPlayerId = null;
     let activeMatchId = null;
+let activeRoundView = Number(state.currentRound || 1);
     let isAdmin = false;
     let logoHoldTimer = null;
 
@@ -933,49 +934,65 @@ $('#saveHistoricalMatchBtn').addEventListener('click', function(){
       }
     }
 
-    function renderMatches(){
-      const box = $('#matchesBox');
-      if(!state.matches.length){
-        box.className = 'empty';
-        box.innerHTML = 'Todavía no hay partidos creados.';
-        updateGenerateButtonLabel();
-        return;
-      }
+   function renderMatches(){
+  const box = $('#matchesBox');
 
-      box.className = '';
-      let html = '';
-      const rounds = Array.from(new Set(state.matches.map(function(match){ return Number(match.round || 1); }))).sort(function(a,b){ return a - b; });
+  if(!state.matches.length){
+    box.className = 'empty';
+    box.innerHTML = 'Todavía no hay partidos creados.';
+    updateGenerateButtonLabel();
+    return;
+  }
 
-      rounds.forEach(function(round){
-        const roundMatches = state.matches.filter(function(match){ return Number(match.round || 1) === round; });
-        html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 0 10px">';
-        html += '<h3 style="margin:0">Fecha ' + round + '</h3>';
-        if(round === Number(state.currentRound || 1)) html += '<span class="hint">Fecha actual</span>';
-        html += '</div>';
+  box.className = '';
 
-        roundMatches.forEach(function(match, index){
-          const home = getTeamById(match.homeId);
-          const away = getTeamById(match.awayId);
-          if(!home || !away) return;
+  const rounds = Array.from(new Set(state.matches.map(function(match){
+    return Number(match.round || 1);
+  }))).sort(function(a,b){ return a - b; });
 
-          ensureMatchTimerFields(match);
-          html += '<div class="team-card" style="margin-bottom:10px;cursor:pointer" onclick="openMatchDetail(\'' + match.id + '\')">';
-          html += '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">';
-          html += '<strong>Partido ' + (index + 1) + '</strong>';
-          html += renderStatusPill(match);
-          html += '</div>';
-          html += '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-top:12px;text-align:center">';
-          html += '<div style="text-align:left"><strong>' + escapeText(home.name) + '</strong></div>';
-          html += '<div><strong>' + (match.homeGoals || 0) + ' - ' + (match.awayGoals || 0) + '</strong><div class="hint" style="margin-top:5px">⏱ ' + formatMatchClock(match) + '</div></div>';
-          html += '<div style="text-align:right"><strong>' + escapeText(away.name) + '</strong></div>';
-          html += '</div>';
-          html += '</div>';
-        });
-      });
+  if(!rounds.includes(activeRoundView)){
+    activeRoundView = rounds[rounds.length - 1];
+  }
 
-      box.innerHTML = html;
-      updateGenerateButtonLabel();
-    }
+  let html = '<div class="btn-row" style="margin-bottom:12px">';
+
+  rounds.forEach(function(round){
+    html += '<button class="' + (round === activeRoundView ? 'primary' : 'secondary') + '" onclick="activeRoundView=' + round + '; renderMatches();">Fecha ' + round + '</button>';
+  });
+
+  html += '</div>';
+
+  const roundMatches = state.matches.filter(function(match){
+    return Number(match.round || 1) === Number(activeRoundView);
+  });
+
+  if(!roundMatches.length){
+    html += '<div class="empty">No hay partidos en esta fecha.</div>';
+  }
+
+  roundMatches.forEach(function(match, index){
+    const home = getTeamById(match.homeId);
+    const away = getTeamById(match.awayId);
+    if(!home || !away) return;
+
+    ensureMatchTimerFields(match);
+
+    html += '<div class="team-card" style="margin-bottom:10px;cursor:pointer" onclick="openMatchDetail(\'' + match.id + '\')">';
+    html += '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">';
+    html += '<strong>Partido ' + (index + 1) + '</strong>';
+    html += renderStatusPill(match);
+    html += '</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-top:12px;text-align:center">';
+    html += '<div style="text-align:left"><strong>' + escapeText(home.name) + '</strong></div>';
+    html += '<div><strong>' + (match.homeGoals || 0) + ' - ' + (match.awayGoals || 0) + '</strong><div class="hint" style="margin-top:5px">⏱ ' + formatMatchClock(match) + '</div></div>';
+    html += '<div style="text-align:right"><strong>' + escapeText(away.name) + '</strong></div>';
+    html += '</div>';
+    html += '</div>';
+  });
+
+  box.innerHTML = html;
+  updateGenerateButtonLabel();
+}
 
     function openMatchDetail(matchId){
       activeMatchId = matchId;
@@ -1087,7 +1104,7 @@ $('#saveHistoricalMatchBtn').addEventListener('click', function(){
       html += '<div class="score-team"><strong>' + escapeText(away.name) + '</strong></div>';
       html += '</div>';
 
-if(!match.closed || (match.historical && isAdmin)){
+if(isAdmin && (match.historical || match.closed)){
   html += '<div class="match-actions-grid">';
   html += renderEventPanel(match, home, 'home');
   html += renderEventPanel(match, away, 'away');
@@ -1102,7 +1119,7 @@ if(!match.closed || (match.historical && isAdmin)){
 
 
     function renderEventPanel(match, team, side){
-      const isClosed = match.closed && !match.historical;
+     const isClosed = false;
       let html = '<div class="event-panel">';
       html += '<h3 style="margin-top:0">' + escapeText(team.name) + '</h3>';
 
