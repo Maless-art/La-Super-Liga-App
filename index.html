@@ -105,46 +105,9 @@ h1{
           <div class="section-title"><h2>Planificador</h2></div>
           <div class="btn-row admin-only" style="margin-bottom:12px">
             <button class="primary" id="generateMatchesBtn">Generar partidos</button>
-<button class="secondary" id="historicalMatchBtn">Partido histórico</button>
           </div>
           <div id="matchesBox" class="empty">Todavía no hay partidos creados.</div>
-<div class="card admin-only" id="historicalMatchCard" style="display:none">
-  <div class="section-title">
-    <h2>Partido histórico</h2>
-    <button class="secondary" id="closeHistoricalBtn">Cerrar</button>
-  </div>
 
-  <div class="form-grid">
-    <div>
-      <label>Fecha</label>
-      <input type="number" id="historicalRound" placeholder="Ej. 1">
-    </div>
-
-    <div>
-      <label>Equipo A</label>
-      <select id="historicalHome"></select>
-    </div>
-
-    <div>
-      <label>Equipo B</label>
-      <select id="historicalAway"></select>
-    </div>
-
-    <div>
-      <label>Goles Equipo A</label>
-      <input type="number" id="historicalHomeGoals" min="0" value="0">
-    </div>
-
-    <div>
-      <label>Goles Equipo B</label>
-      <input type="number" id="historicalAwayGoals" min="0" value="0">
-    </div>
-
-    <div class="full">
-    <button class="primary" id="saveHistoricalMatchBtn">Guardar partido histórico</button> 
-    </div>
-  </div>
-</div>
 
         </div>
       </section>
