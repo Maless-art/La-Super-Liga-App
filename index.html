@@ -108,7 +108,7 @@ h1{
           </div>
           <div id="matchesBox" class="empty">Todavía no hay partidos creados.</div>
 
-</div>
+
         </div>
       </section>
       <section class="screen" id="screen-estadisticas"><div class="card"><div class="section-title"><h2>Estadísticas</h2></div><select id="statsSelector"><option value="goles">Tabla de goles</option><option value="heroes">Los héroes</option><option value="tarjetas">Tarjetas</option></select><div id="statsBox" style="margin-top:14px"></div></div></section>
@@ -725,81 +725,6 @@ function listenToCloud(){
 }
 
 
-function renderHistoricalTeams(){
-  const home = $('#historicalHome');
-  const away = $('#historicalAway');
-  if(!home || !away) return;
-
-  const options = state.teams.map(function(team){
-    return '<option value="' + team.id + '">' + escapeText(team.name) + '</option>';
-  }).join('');
-
-  home.innerHTML = options;
-  away.innerHTML = options;
-
-  $('#historicalRound').value = state.currentRound || 1;
-}
-
-$('#historicalMatchBtn').addEventListener('click', function(){
-  renderHistoricalTeams();
-  $('#historicalMatchCard').style.display = 'block';
-});
-
-$('#closeHistoricalBtn').addEventListener('click', function(){
-  $('#historicalMatchCard').style.display = 'none';
-});
-
-$('#saveHistoricalMatchBtn').addEventListener('click', function(){
-  const round = Number($('#historicalRound').value || 1);
-  const homeId = $('#historicalHome').value;
-  const awayId = $('#historicalAway').value;
-  const homeGoals = Number($('#historicalHomeGoals').value || 0);
-  const awayGoals = Number($('#historicalAwayGoals').value || 0);
-
-  if(!homeId || !awayId){
-    alert('Selecciona ambos equipos.');
-    return;
-  }
-
-  if(homeId === awayId){
-    alert('No puedes seleccionar el mismo equipo.');
-    return;
-  }
-
-  if(!confirm('¿Guardar este partido histórico? Se sumará a la tabla y estadísticas.')) return;
-
-  state.matches.push({
-    id: crypto.randomUUID(),
-    round: round,
-    historical: true,
-    homeId: homeId,
-    awayId: awayId,
-    homeGoals: homeGoals,
-    awayGoals: awayGoals,
-    goals: [],
-    cards: [],
-    events: [],
-    closed: true,
-    expanded: true,
-    status: 'finished',
-    timerMode: 'quick',
-    halfMinutes: 25,
-    period: 1,
-    elapsed: 0,
-    addedMinutes: 0,
-    addedActive: false
-  });
-
-  if(round > Number(state.currentRound || 1)){
-    state.currentRound = round;
-  }
-
-  $('#historicalHomeGoals').value = 0;
-  $('#historicalAwayGoals').value = 0;
-  $('#historicalMatchCard').style.display = 'none';
-
-  saveState();
-});
     function getTeamById(teamId){
       return state.teams.find(function(t){ return t.id === teamId; });
     }
