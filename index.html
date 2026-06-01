@@ -745,31 +745,16 @@ function listenToCloud(){
     }
 
     function generateMatches(){
-      if(!canGenerateMatches()){
-        alert('Para generar partidos necesitas mínimo 2 equipos y al menos 1 jugador por equipo.');
-        return;
-      }
+  const nextRound = state.matches.length
+    ? Math.max(...state.matches.map(m => Number(m.round || 1))) + 1
+    : 1;
 
-      if(!state.matches.length){
-        if(!confirm('¿Deseas generar la Fecha 1?')) return;
-        state.currentRound = 1;
-        state.matches = createRoundMatches(1);
-        saveState();
-        return;
-      }
+  if(!confirm('¿Deseas crear la Fecha ' + nextRound + '?')) return;
 
-      if(!isCurrentRoundComplete()){
-        alert('No puedes generar una nueva fecha hasta finalizar todos los partidos de la fecha actual.');
-        return;
-      }
-
-      const nextRound = Number(state.currentRound || 1) + 1;
-      if(!confirm('¿Deseas generar la Fecha ' + nextRound + '? Los resultados y estadísticas acumuladas se conservarán.')) return;
-
-      state.currentRound = nextRound;
-      state.matches = state.matches.concat(createRoundMatches(nextRound));
-      saveState();
-    }
+  state.currentRound = nextRound;
+  activeRoundView = nextRound;
+  saveState();
+}
 
 
 function renderHistoricalTeams(){
