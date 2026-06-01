@@ -1408,6 +1408,49 @@ $('#cancelMatchBtn').addEventListener('click', function(){
   createMatchCard.style.display = 'none';
 });
 
+
+$('#saveMatchBtn').addEventListener('click', function(){
+  const homeId = $('#newMatchHome').value;
+  const awayId = $('#newMatchAway').value;
+
+  if(!homeId || !awayId){
+    alert('Selecciona ambos equipos.');
+    return;
+  }
+
+  if(homeId === awayId){
+    alert('No puedes crear un partido contra el mismo equipo.');
+    return;
+  }
+
+  const round = Number(activeRoundView || state.currentRound || 1);
+
+  state.matches.push({
+    id: crypto.randomUUID(),
+    round: round,
+    homeId: homeId,
+    awayId: awayId,
+    homeGoals: 0,
+    awayGoals: 0,
+    goals: [],
+    cards: [],
+    events: [],
+    closed: false,
+    expanded: true,
+    status: 'pending',
+    timerMode: 'quick',
+    halfMinutes: 7,
+    period: 1,
+    elapsed: 0,
+    addedMinutes: 0,
+    addedActive: false
+  });
+
+  $('#createMatchCard').style.display = 'none';
+  saveState();
+});
+
+
     function formatTimer(seconds){
       const m = String(Math.floor(seconds / 60)).padStart(2,'0');
       const s = String(seconds % 60).padStart(2,'0');
