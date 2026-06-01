@@ -104,11 +104,25 @@ h1{
         <div class="card">
           <div class="section-title"><h2>Planificador</h2></div>
           <div class="btn-row admin-only" style="margin-bottom:12px">
-            <button class="primary" id="generateMatchesBtn">Generar partidos</button>
+       
+  <button class="primary" id="generateMatchesBtn">Nueva fecha</button>
+  <button class="secondary" id="createMatchBtn">Crear partido</button>
+
           </div>
           <div id="matchesBox" class="empty">Todavía no hay partidos creados.</div>
 
+<div class="card admin-only" id="createMatchCard" style="display:none;margin-top:12px">
+  <h3>Crear partido</h3>
 
+  <select id="newMatchHome"></select>
+
+  <select id="newMatchAway" style="margin-top:8px"></select>
+
+  <div class="btn-row" style="margin-top:12px">
+    <button class="primary" id="saveMatchBtn">Guardar partido</button>
+    <button class="secondary" id="cancelMatchBtn">Cancelar</button>
+  </div>
+</div>
         </div>
       </section>
       <section class="screen" id="screen-estadisticas"><div class="card"><div class="section-title"><h2>Estadísticas</h2></div><select id="statsSelector"><option value="goles">Tabla de goles</option><option value="heroes">Los héroes</option><option value="tarjetas">Tarjetas</option></select><div id="statsBox" style="margin-top:14px"></div></div></section>
@@ -1372,6 +1386,27 @@ if(generateMatchesBtn){
 saveToCloud();
 renderAll();
     });
+
+const createMatchBtn = $('#createMatchBtn');
+const createMatchCard = $('#createMatchCard');
+
+if(createMatchBtn){
+  createMatchBtn.addEventListener('click', function(){
+
+    const options = state.teams.map(function(team){
+      return '<option value="' + team.id + '">' + escapeText(team.name) + '</option>';
+    }).join('');
+
+    $('#newMatchHome').innerHTML = options;
+    $('#newMatchAway').innerHTML = options;
+
+    createMatchCard.style.display = 'block';
+  });
+}
+
+$('#cancelMatchBtn').addEventListener('click', function(){
+  createMatchCard.style.display = 'none';
+});
 
     function formatTimer(seconds){
       const m = String(Math.floor(seconds / 60)).padStart(2,'0');
