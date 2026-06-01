@@ -1340,7 +1340,10 @@ if(match.historical){
     }
 
     $('#statsSelector').addEventListener('change', renderStats);
-    $('#generateMatchesBtn').addEventListener('click', generateMatches);
+   const generateMatchesBtn = $('#generateMatchesBtn');
+if(generateMatchesBtn){
+  generateMatchesBtn.addEventListener('click', generateMatches);
+}
     $('#squadTeamSelect').addEventListener('change', function(){ clearPlayerForm(); renderEditPlayerSelect(); });
 
     $('#editModeBtn').addEventListener('click', function(){
