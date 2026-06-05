@@ -777,19 +777,25 @@ function listenToCloud(){
       return Math.floor((seconds || 0) / 60) + "'";
     }
 
-    function formatMatchClock(match){
-      ensureMatchTimerFields(match);
-      const seconds = match.elapsed || 0;
-      const m = String(Math.floor(seconds / 60)).padStart(2,'0');
-      const s = String(seconds % 60).padStart(2,'0');
-      const base = m + ':' + s;
+  function formatMatchClock(match){
+  ensureMatchTimerFields(match);
 
-      if(match.timerMode === 'defined' && match.addedActive === true && Number(match.addedMinutes) > 0){
-        return base + ' +' + match.addedMinutes;
-      }
+  let seconds = Number(match.elapsed || 0);
 
-      return base;
-    }
+  if(match.status === 'live' && match.startedAt){
+    seconds += Math.floor((Date.now() - match.startedAt) / 1000);
+  }
+
+  const m = String(Math.floor(seconds / 60)).padStart(2,'0');
+  const s = String(seconds % 60).padStart(2,'0');
+  const base = m + ':' + s;
+
+  if(match.timerMode === 'defined' && match.addedActive === true && Number(match.addedMinutes) > 0){
+    return base + ' +' + match.addedMinutes;
+  }
+
+  return base;
+}
 
     function getMatchStatus(match){
       ensureMatchTimerFields(match);
@@ -1535,101 +1541,76 @@ $('#saveMatchBtn').addEventListener('click', function(){
     }
 
     function startSelectedMatchTimer(){
-      const match = getMatchById(activeMatchId);
-      if(!match || match.closed) return;
-      ensureMatchTimerFields(match);
-      if(timerInterval) return;
+  const match = getMatchById(activeMatchId);
+  if(!match || match.closed) return;
 
-      if(match.status === 'halftime' && match.timerMode === 'defined'){
-        match.period = 2;
-        match.elapsed = Number(match.halfMinutes || 25) * 60;
-        match.addedActive = false;
-      }
+  ensureMatchTimerFields(match);
 
-      match.status = 'live';
-      matchStatus = 'live';
-      updateMatchStatusBadge();
-      syncTimerDisplays(match);
-      localStorage.setItem(KEY, JSON.stringify(state));
-      renderMatches();
+  if(match.status === 'halftime' && match.timerMode === 'defined'){
+    match.period = 2;
+    match.elapsed = Number(match.halfMinutes || 25) * 60;
+    match.addedActive = false;
+  }
 
-      timerInterval = setInterval(function(){
-        match.elapsed = (match.elapsed || 0) + 1;
-        timerSeconds = match.elapsed;
-        syncTimerDisplays(match);
-        localStorage.setItem(KEY, JSON.stringify(state));
-        renderMatches();
-      }, 1000);
-    }
+  match.status = 'live';
+  match.startedAt = Date.now();
 
-    function pauseSelectedMatchTimer(){
-      const match = getMatchById(activeMatchId);
-      clearInterval(timerInterval);
-      timerInterval = null;
-      if(match && !match.closed){
-        match.status = 'halftime';
-        match.addedActive = false;
-        matchStatus = 'halftime';
-        updateMatchStatusBadge();
-        saveState();
-        renderMatches();
-        renderMatchDetail();
-      }
-    }
+  matchStatus = 'live';
+  updateMatchStatusBadge();
+  syncTimerDisplays(match);
 
+  saveState();
+
+  if(timerInterval) clearInterval(timerInterval);
+
+  timerInterval = setInterval(function(){
+    syncTimerDisplays(match);
+    renderMatches();
+  }, 1000);
+}
+
+function pauseSelectedMatchTimer(){
+  const match = getMatchById(activeMatchId);
+  if(!match || match.closed) return;
+
+  if(match.status === 'live' && match.startedAt){
+    match.elapsed = Number(match.elapsed || 0) + Math.floor((Date.now() - match.startedAt) / 1000);
+    match.startedAt = null;
+  }
+
+  clearInterval(timerInterval);
+  timerInterval = null;
+
+  match.status = 'halftime';
+  match.addedActive = false;
+  matchStatus = 'halftime';
+
+  updateMatchStatusBadge();
+  saveState();
+  renderMatches();
+  renderMatchDetail();
+}
     function finishSelectedMatch(){
-      const match = getMatchById(activeMatchId);
-      if(!match) return;
-      clearInterval(timerInterval);
-      timerInterval = null;
-      match.closed = true;
-      match.status = 'finished';
-      matchStatus = 'finished';
-      updateMatchStatusBadge();
-      saveState();
-      renderMatches();
-      closeMatchDetail();
-    }
+  const match = getMatchById(activeMatchId);
+  if(!match) return;
 
-    const startTimerBtn = $('#startTimer');
-    const pauseTimerBtn = $('#pauseTimer');
-    const resetTimerBtn = $('#resetTimer');
+  if(match.status === 'live' && match.startedAt){
+    match.elapsed = Number(match.elapsed || 0) + Math.floor((Date.now() - match.startedAt) / 1000);
+    match.startedAt = null;
+  }
 
-    if(startTimerBtn){
-      startTimerBtn.addEventListener('click', function(){
-        if(activeMatchId){ startSelectedMatchTimer(); return; }
-        if(timerInterval) return;
-        matchStatus = 'live';
-        updateMatchStatusBadge();
-        timerInterval = setInterval(function(){
-          timerSeconds++;
-          const timerDisplay = $('#timerDisplay');
-          if(timerDisplay) timerDisplay.textContent = formatTimer(timerSeconds);
-        }, 1000);
-      });
-    }
+  clearInterval(timerInterval);
+  timerInterval = null;
 
-    if(pauseTimerBtn){
-      pauseTimerBtn.addEventListener('click', function(){
-        if(activeMatchId){ pauseSelectedMatchTimer(); return; }
-        clearInterval(timerInterval);
-        timerInterval = null;
-        if(timerSeconds > 0){ matchStatus = 'halftime'; updateMatchStatusBadge(); }
-      });
-    }
+  match.closed = true;
+  match.status = 'finished';
+  matchStatus = 'finished';
 
-    if(resetTimerBtn){
-      resetTimerBtn.addEventListener('click', function(){
-        if(activeMatchId){ finishSelectedMatch(); return; }
-        clearInterval(timerInterval);
-        timerInterval = null;
-        matchStatus = timerSeconds > 0 ? 'finished' : 'idle';
-        timerSeconds = 0;
-        const timerDisplay = $('#timerDisplay');
-        if(timerDisplay) timerDisplay.textContent = '00:00';
-        updateMatchStatusBadge();
-      });
-    }
+  updateMatchStatusBadge();
+  saveState();
+  renderMatches();
+  closeMatchDetail();
+}
 
     function renderSummary(){
       $('#teamCount').textContent = state.teams.length;
