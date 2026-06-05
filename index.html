@@ -1640,6 +1640,13 @@ function startLiveViewerClock(){
   renderSquadSelect();
   renderTeamStatus();
   renderMatches();
+if(activeMatchId && document.querySelector('.match-modal.active')){
+  if(isAdmin){
+    renderMatchDetail();
+  }else{
+    renderPublicMatchDetail();
+  }
+}
   renderStats();
   updateAdminView();
   updateMatchStatusBadge();
