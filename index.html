@@ -1618,22 +1618,38 @@ function pauseSelectedMatchTimer(){
       $('#playerCount').textContent = state.teams.reduce(function(sum, team){ return sum + team.players.length; }, 0);
     }
 
-    function renderAll(){
-    
-      renderSummary();
-      renderStandings();
-      renderTeams();
-      renderSquadSelect();
-      renderTeamStatus();
-      renderMatches();
-      renderStats();
-      updateAdminView();
-      updateMatchStatusBadge();
+function startLiveViewerClock(){
+  if(window.liveViewerInterval) clearInterval(window.liveViewerInterval);
+
+  window.liveViewerInterval = setInterval(function(){
+    const openMatch = getMatchById(activeMatchId);
+
+    if(openMatch && openMatch.status === 'live'){
+      const timer = document.querySelector('.match-modal.active .timer');
+      if(timer) timer.textContent = formatMatchClock(openMatch);
     }
+
+    renderMatches();
+  }, 1000);
+}
+
+ function renderAll(){
+  renderSummary();
+  renderStandings();
+  renderTeams();
+  renderSquadSelect();
+  renderTeamStatus();
+  renderMatches();
+  renderStats();
+  updateAdminView();
+  updateMatchStatusBadge();
+  startLiveViewerClock();
+}
 
     renderAll();
 loadFromCloud();
 listenToCloud();
+
   </script>
 </body>
 </html>
