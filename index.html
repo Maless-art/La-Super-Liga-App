@@ -68,7 +68,14 @@ h1{
     input,select{width:100%;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:14px;padding:11px 12px;font-size:14px}label{display:block;margin-bottom:6px;color:var(--muted);font-size:12px;font-weight:800;text-transform:uppercase}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.full{grid-column:1/-1}.locked{display:grid;gap:12px;max-width:420px;margin:0 auto}.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.team-card{border:1px solid var(--line);border-radius:18px;padding:14px;background:rgba(127,127,127,.035)}.team-logo{width:54px;height:54px;border-radius:16px;background:rgba(127,127,127,.14);display:grid;place-items:center;font-weight:900;overflow:hidden;margin-bottom:10px}.team-logo img{width:100%;height:100%;object-fit:cover}.team-summary-card{cursor:pointer;position:relative;min-height:135px}.team-summary-card:after{content:'›';position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:34px;color:var(--muted)}.team-detail-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}.back-team-btn{border:0;background:transparent;color:var(--text);font-size:28px;cursor:pointer;padding:0 6px 0 0}.position-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.position-box{border:1px solid var(--line);border-radius:18px;padding:12px;background:rgba(127,127,127,.025)}.position-title{margin:0 0 10px;font-size:14px;font-weight:900;text-transform:uppercase}.position-title.pt{color:#0f7a43}.position-title.def{color:#2563eb}.position-title.med{color:#f59e0b}.position-title.del{color:#dc2626}.player-row{width:100%;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px;background:rgba(127,127,127,.06);color:var(--text);font-weight:900;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;text-align:left}.player-row .pos-pill{background:rgba(127,127,127,.14);border-radius:999px;padding:4px 8px;font-size:11px}.team-list-hidden{display:none}
     .player-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}.player-modal.active{display:flex}.player-card{width:min(430px,100%);max-height:92vh;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.35);overflow:auto}.player-photo{background:#111;border-bottom:1px solid var(--line)}.player-photo img{width:100%;height:auto;display:block;object-fit:contain}.player-photo.no-photo{height:220px;display:grid;place-items:center;font-size:52px;font-weight:900;color:var(--muted);background:rgba(127,127,127,.12)}.player-info{padding:12px;background:var(--card)}.player-info h3{margin:0 0 6px;font-size:24px;line-height:1.1}.player-badge{display:inline-block;background:var(--primary);color:#fff;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900;margin-bottom:10px}.player-data{display:grid;grid-template-columns:1fr 1fr;gap:7px}.player-data div{border:1px solid var(--line);border-radius:12px;padding:8px;background:rgba(127,127,127,.04);display:flex;align-items:center;gap:4px;min-height:34px}.player-data span{color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;white-space:nowrap}.player-data strong{font-size:15px}.close-player{width:100%;margin-top:10px}.match-modal{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:16px;z-index:55}.match-modal.active{display:flex}.match-card-modal{width:min(760px,100%);max-height:92vh;overflow:auto;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.35);padding:16px}.match-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.score-board{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center;margin:14px 0}.score-team{border:1px solid var(--line);border-radius:18px;padding:12px;background:rgba(127,127,127,.04)}.score-num{width:68px;height:58px;border-radius:16px;border:1px solid var(--line);display:grid;place-items:center;font-size:30px;font-weight:900;background:rgba(127,127,127,.08)}.match-actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.event-panel{border:1px solid var(--line);border-radius:18px;padding:12px;background:rgba(127,127,127,.025)}.event-list{display:grid;gap:8px;margin-top:10px}.event-item{border:1px solid var(--line);border-radius:14px;padding:9px 10px;background:rgba(127,127,127,.05);font-size:13px}.card-dot{display:inline-block;width:12px;height:16px;border-radius:3px;margin-right:5px;vertical-align:middle}.card-yellow{background:#facc15}.card-red{background:#dc2626}.disabled-option{color:#999}.finalized-note{padding:10px;border-radius:14px;background:rgba(127,127,127,.08);font-weight:800;text-align:center;margin-top:10px}.close-player{width:100%;margin-top:10px}
     @media(max-width:650px){.form-grid{grid-template-columns:1fr}table{font-size:12px}th,td{padding:9px 5px}.player-card{width:min(420px,100%)}.player-info h3{font-size:23px}}
-  </style>
+.app-version-badge{
+  font-size:12px;
+  font-weight:600;
+  opacity:.75;
+  margin-left:6px;
+  vertical-align:middle;
+}  
+</style>
 
 
 <link rel="manifest" href="manifest.json">
@@ -88,14 +95,33 @@ h1{
     </div>
 
     <div>
-      <h1>La Super Liga</h1>
-      <p class="subtitle">Gestor personalizado de torneos</p>
-    </div>
+  <h1>
+    La Super Liga
+    <span class="app-version-badge">v1.2</span>
+  </h1>
+
+  <p class="subtitle">Gestor personalizado de torneos</p>
+</div>
   </div>
 
  
 </div>
-      <div class="summary-grid"><div class="summary-card"><strong id="teamCount">0</strong><span>Equipos</span></div><div class="summary-card"><strong id="matchCount">0</strong><span>Partidos</span></div><div class="summary-card"><strong id="playerCount">0</strong><span>Jugadores</span></div></div>
+      <div class="summary-grid">
+  <div class="summary-card">
+    <strong id="teamCount">0</strong>
+    <span>Equipos</span>
+  </div>
+
+  <div class="summary-card">
+    <strong id="phaseCount">Apertura</strong>
+    <span>Fase</span>
+  </div>
+
+  <div class="summary-card">
+    <strong id="roundCount">1/7</strong>
+    <span>Fecha</span>
+  </div>
+</div>
 
     </header>
     <main>
@@ -107,6 +133,7 @@ h1{
        
   <button class="primary" id="generateMatchesBtn">Nueva fecha</button>
   <button class="secondary" id="createMatchBtn">Crear partido</button>
+<button class="secondary" id="closePhaseBtn">Cerrar Apertura</button>
 
           </div>
           <div id="matchesBox" class="empty">Todavía no hay partidos creados.</div>
@@ -183,11 +210,18 @@ h1{
     const KEY = 'la_super_liga_v1';
     const BACKUP_KEY = 'la_super_liga_backup_v1';
     const ADMIN_PASSWORD = 'admin123';
+    const EDIT_PASSWORD = '2667';
     const DB_NAME = 'la_super_liga_db';
     const DB_VERSION = 1;
     const STORE_IMAGES = 'images';
 
-    let state = JSON.parse(localStorage.getItem(KEY)) || { teams:[], matches:[], currentRound:1 };
+let state = JSON.parse(localStorage.getItem(KEY)) || {
+  teams: [],
+  matches: [],
+  currentRound: 1,
+  phase: 'Apertura'
+};
+if(!state.phase) state.phase = 'Apertura';
     if(!state.teams) state.teams = [];
     if(!state.matches) state.matches = [];
     if(!state.currentRound) state.currentRound = 1;
@@ -651,10 +685,31 @@ function listenToCloud(){
       box.innerHTML = html;
     }
 
-    function canGenerateMatches(){
-      if(state.teams.length < 2) return false;
-      return state.teams.every(function(team){ return team.players.length > 0; });
-    }
+    function generateMatches(){
+  if(!state.rounds) state.rounds = [];
+
+  const currentMaxRound = state.rounds.length
+    ? Math.max(...state.rounds)
+    : Number(state.currentRound || 1);
+
+  if(currentMaxRound >= 7){
+    alert('Ya llegaste a la Fecha 7/7 de ' + (state.phase || 'Apertura') + '. Debes cerrar esta fase antes de iniciar la siguiente.');
+    return;
+  }
+
+  const nextRound = currentMaxRound + 1;
+
+  if(!confirm('¿Deseas crear la Fecha ' + nextRound + '/7?')) return;
+
+  if(!state.rounds.includes(nextRound)){
+    state.rounds.push(nextRound);
+  }
+
+  state.currentRound = nextRound;
+  activeRoundView = nextRound;
+
+  saveState();
+}
 
     function getCurrentRoundMatches(){
       return state.matches.filter(function(match){ return Number(match.round || 1) === Number(state.currentRound || 1); });
@@ -721,22 +776,6 @@ function listenToCloud(){
       if(!btn) return;
       btn.textContent = state.matches.length ? 'Nueva fecha' : 'Generar partidos';
     }
-
-    function generateMatches(){
-  if(!state.rounds) state.rounds = [];
-
-  const nextRound = state.rounds.length
-    ? Math.max(...state.rounds) + 1
-    : 1;
-
-  if(!confirm('¿Deseas crear la Fecha ' + nextRound + '?')) return;
-
-  state.rounds.push(nextRound);
-  state.currentRound = nextRound;
-  activeRoundView = nextRound;
-
-  saveState();
-}
 
 
     function getTeamById(teamId){
@@ -995,7 +1034,11 @@ const rounds = Array.from(new Set([...(state.rounds || []), ...matchRounds]))
      }else{
   html += '<div class="finalized-note">Partido finalizado · consulta de datos</div>';
 
-  
+  if(isAdmin){
+    html += '<div class="btn-row" style="margin-top:10px">';
+    html += '<button class="primary" onclick="unlockMatchForEdit()">✏️ Editar partido</button>';
+    html += '</div>';
+  }
 }
 
       html += '<div class="score-board">';
@@ -1042,6 +1085,27 @@ if(!isClosed || (match.historical && isAdmin)){
       return html;
     }
 
+function unlockMatchForEdit(){
+  const match = getMatchById(activeMatchId);
+  if(!match) return;
+
+  const pass = prompt('Contraseña para editar partido finalizado:');
+  if(pass === null) return;
+
+  if(pass !== EDIT_PASSWORD){
+    alert('Contraseña incorrecta.');
+    return;
+  }
+
+  if(!confirm('¿Habilitar edición de este partido?')) return;
+
+  match.closed = false;
+  match.status = 'finished-edit';
+
+  saveState();
+  renderMatchDetail();
+}
+
     function renderEvents(match){
       const events = (match.events || []).slice().sort(function(a,b){ return (a.seconds || 0) - (b.seconds || 0); });
       if(!events.length) return '<div class="empty">Sin eventos registrados.</div>';
@@ -1061,13 +1125,23 @@ if(!isClosed || (match.historical && isAdmin)){
       return '';
     }
 
+function getCurrentMatchSeconds(match){
+  let seconds = Number(match.elapsed || 0);
+
+  if(match.status === 'live' && match.startedAt){
+    seconds += Math.floor((Date.now() - match.startedAt) / 1000);
+  }
+
+  return seconds;
+}
+
     function addGoalEvent(matchId, teamId, side){
       const match = getMatchById(matchId);
       if(!match || match.closed) return;
       const playerId = $('#goal_' + side).value;
       if(!playerId){ alert('Selecciona el goleador.'); return; }
       if(!match.events) match.events = [];
-      match.events.push({type:'goal', teamId:teamId, playerId:playerId, seconds:match.elapsed || timerSeconds || 0});
+      match.events.push({type:'goal', teamId:teamId, playerId:playerId, seconds:getCurrentMatchSeconds(match)});
       if(side === 'home') match.homeGoals = Number(match.homeGoals || 0) + 1;
       if(side === 'away') match.awayGoals = Number(match.awayGoals || 0) + 1;
       saveState();
@@ -1080,7 +1154,7 @@ if(!isClosed || (match.historical && isAdmin)){
       const playerId = $('#card_' + side).value;
       if(!playerId){ alert('Selecciona el jugador.'); return; }
       if(!match.events) match.events = [];
-      match.events.push({type:cardType, teamId:teamId, playerId:playerId, seconds:match.elapsed || timerSeconds || 0});
+      match.events.push({type:cardType, teamId:teamId, playerId:playerId, seconds:getCurrentMatchSeconds(match)});
       saveState();
       renderMatchDetail();
     }
@@ -1456,6 +1530,48 @@ $('#saveMatchBtn').addEventListener('click', function(){
   saveState();
 });
 
+const closePhaseBtn = $('#closePhaseBtn');
+
+if(closePhaseBtn){
+  closePhaseBtn.addEventListener('click', function(){
+
+    const currentRound = Number(state.currentRound || 1);
+    const phase = state.phase || 'Apertura';
+
+ if(currentRound < 7){
+  alert(
+    'No se puede cerrar ' + phase + '.\n\n' +
+    'Fecha actual: ' + currentRound + '/7\n\n' +
+    'Debes completar las 7 fechas antes de cerrar esta fase.'
+  );
+  return;
+}
+
+    const confirmClose = confirm(
+      '¿Seguro que deseas cerrar ' + phase + '?\n\n' +
+      'Se conservarán equipos y jugadores.\n' +
+      'Se reiniciarán partidos, goles, tarjetas y tabla para iniciar la siguiente fase.'
+    );
+
+    if(!confirmClose) return;
+
+    if(phase === 'Apertura'){
+      state.phase = 'Clausura';
+    }else{
+      state.phase = 'Apertura';
+    }
+
+ state.matches = [];
+state.currentRound = 1;
+state.rounds = [];
+activeRoundView = 1;
+
+    saveState();
+
+    alert('Nueva fase iniciada: ' + state.phase);
+  });
+}
+
 
     function formatTimer(seconds){
       const m = String(Math.floor(seconds / 60)).padStart(2,'0');
@@ -1612,11 +1728,17 @@ function pauseSelectedMatchTimer(){
   closeMatchDetail();
 }
 
-    function renderSummary(){
-      $('#teamCount').textContent = state.teams.length;
-      $('#matchCount').textContent = state.matches.length;
-      $('#playerCount').textContent = state.teams.reduce(function(sum, team){ return sum + team.players.length; }, 0);
-    }
+   function renderSummary(){
+
+  $('#teamCount').textContent = state.teams.length;
+
+  $('#phaseCount').textContent =
+    state.phase || 'Apertura';
+
+  $('#roundCount').textContent =
+    (state.currentRound || 1) + '/7';
+
+}
 
 function startLiveViewerClock(){
   if(window.liveViewerInterval) clearInterval(window.liveViewerInterval);
@@ -1633,6 +1755,23 @@ function startLiveViewerClock(){
   }, 1000);
 }
 
+
+function updateClosePhaseButton(){
+  const btn = $('#closePhaseBtn');
+  if(!btn) return;
+
+  const currentRound = Number(state.currentRound || 1);
+  const phase = state.phase || 'Apertura';
+
+  btn.textContent = 'Cerrar ' + phase;
+  btn.disabled = false;
+
+  if(currentRound >= 7){
+    btn.className = 'primary';
+  }else{
+    btn.className = 'secondary';
+  }
+}
  function renderAll(){
   renderSummary();
   renderStandings();
@@ -1650,7 +1789,9 @@ if(activeMatchId && document.querySelector('.match-modal.active')){
   renderStats();
   updateAdminView();
   updateMatchStatusBadge();
+updateClosePhaseButton();
   startLiveViewerClock();
+
 }
 
     renderAll();
