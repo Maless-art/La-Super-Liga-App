@@ -787,6 +787,13 @@ function listenToCloud(){
       return state.matches.find(function(m){ return m.id === matchId; });
     }
 
+    function getOpponentTeamId(match, teamId){
+      if(!match) return '';
+      if(teamId === match.homeId) return match.awayId;
+      if(teamId === match.awayId) return match.homeId;
+      return '';
+    }
+
     function ensureEventIds(match){
       if(!match) return;
       if(!match.events) match.events = [];
@@ -802,9 +809,17 @@ function listenToCloud(){
       let awayGoals = 0;
 
       (match.events || []).forEach(function(ev){
-        if(ev.type !== 'goal') return;
-        if(ev.teamId === match.homeId) homeGoals++;
-        if(ev.teamId === match.awayId) awayGoals++;
+        if(ev.type === 'goal'){
+          if(ev.teamId === match.homeId) homeGoals++;
+          if(ev.teamId === match.awayId) awayGoals++;
+        }
+
+        if(ev.type === 'ownGoal'){
+          const goalForTeamId = ev.goalForTeamId || getOpponentTeamId(match, ev.teamId);
+          ev.goalForTeamId = goalForTeamId;
+          if(goalForTeamId === match.homeId) homeGoals++;
+          if(goalForTeamId === match.awayId) awayGoals++;
+        }
       });
 
       match.homeGoals = homeGoals;
@@ -1156,11 +1171,17 @@ function unlockMatchForEdit(){
       let icon = '';
 
       if(ev.type === 'goal') icon = '⚽ ';
+      if(ev.type === 'ownGoal') icon = '⚽ ';
       if(ev.type === 'yellow') icon = '<span class="card-dot card-yellow"></span>';
       if(ev.type === 'red') icon = '<span class="card-dot card-red"></span>';
       if(!icon) return '';
 
-      const content = icon + '<strong>' + name + '</strong>' + meta + minute;
+      let content = icon + '<strong>' + name + '</strong>' + meta + minute;
+      if(ev.type === 'ownGoal'){
+        const goalForTeam = match ? getTeamById(ev.goalForTeamId || getOpponentTeamId(match, ev.teamId)) : null;
+        const goalForName = goalForTeam ? escapeText(goalForTeam.name) : 'rival';
+        content = icon + '<strong>Autogol de ' + name + '</strong>' + meta + minute + '<div class="hint" style="margin-top:4px">Gol para ' + goalForName + ' · no cuenta en goleadores</div>';
+      }
       let actions = '';
 
       if(isAdmin && match){
@@ -1204,6 +1225,17 @@ function unlockMatchForEdit(){
       if(!newPlayerId) return;
 
       let newType = ev.type;
+      if(ev.type === 'goal' || ev.type === 'ownGoal'){
+        const goalAnswer = prompt('Tipo de gol: escribe G para gol normal o A para autogol', ev.type === 'ownGoal' ? 'A' : 'G');
+        if(goalAnswer === null) return;
+        const normalizedGoal = goalAnswer.trim().toUpperCase();
+        if(normalizedGoal !== 'G' && normalizedGoal !== 'A'){
+          alert('Tipo de gol inválido.');
+          return;
+        }
+        newType = normalizedGoal === 'A' ? 'ownGoal' : 'goal';
+      }
+
       if(ev.type === 'yellow' || ev.type === 'red'){
         const cardAnswer = prompt('Tipo de tarjeta: escribe A para amarilla o R para roja', ev.type === 'yellow' ? 'A' : 'R');
         if(cardAnswer === null) return;
@@ -1228,6 +1260,11 @@ function unlockMatchForEdit(){
       ev.playerId = newPlayerId;
       ev.type = newType;
       ev.seconds = minuteNumber * 60;
+      if(newType === 'ownGoal'){
+        ev.goalForTeamId = getOpponentTeamId(match, ev.teamId);
+      }else{
+        delete ev.goalForTeamId;
+      }
 
       syncMatchScoreFromEvents(match);
       saveState();
@@ -1323,6 +1360,37 @@ if(match.historical){
   }
 
   addGoalEvent(matchId, teamId, side);
+}
+
+function addSmartOwnGoalEvent(matchId, teamId, side){
+  const match = getMatchById(matchId);
+  if(!match) return;
+  if(match.closed && !match.historical) return;
+
+  const playerId = $('#goal_' + side).value;
+  if(!playerId){ alert('Selecciona el jugador que hizo el autogol.'); return; }
+
+  let seconds = getCurrentMatchSeconds(match);
+
+  if(match.historical){
+    const minute = prompt('Minuto del autogol:', '0');
+    if(minute === null) return;
+    seconds = Number(minute || 0) * 60;
+  }
+
+  if(!match.events) match.events = [];
+  match.events.push({
+    id:crypto.randomUUID(),
+    type:'ownGoal',
+    teamId:teamId,
+    goalForTeamId:getOpponentTeamId(match, teamId),
+    playerId:playerId,
+    seconds:seconds
+  });
+
+  syncMatchScoreFromEvents(match);
+  saveState();
+  renderMatchDetail();
 }
 
 function addSmartCardEvent(matchId, teamId, side, cardType){
